@@ -15,7 +15,7 @@
 #include <arpa/inet.h>
 #include <cstdlib>
 
-#define PORT 0x80
+#define PORT 0x8950
 #define DIRSIZE 8192
 
 using namespace std;
@@ -61,7 +61,8 @@ int main(int argc, char** argv)
         perror("listen error"); // throw new error
         exit(1); // kill
     }
-   
+       
+    //do{ 
     // client accept talk
     addrlen = sizeof(pin);
     if((sd_current = accept(sd, (struct sockaddr *) &pin, (socklen_t *) &addrlen)) == -1)
@@ -69,25 +70,20 @@ int main(int argc, char** argv)
         perror("accept error"); //throw new error
         exit(1);
     }
-        
-    do{ 
-        if(sd_current != -1)
-        {
-            printf("Connect from: %s \n", inet_ntoa(pin.sin_addr));
-            printf("From port: %d \n", ntohs(pin.sin_port)); 
-            if(recv(sd_current, dir, sizeof(dir), 0) == -1)
-            {
-                perror("recv error"); //throw new error
-                exit(1); //fakill
-            }
-        }else{
-            perror("connection error: ");
-            close(sd_current);
-            close(sd);
-            exit(1);
-        }
-    printf("The message: %s \n", dir);
-    }while(true);
+    
+    if(recv(sd_current, dir, sizeof(dir),0) == -1)
+    {
+        perror("receive error: ");
+        exit(1);
+    }
+    
+    printf("Connection from: %s\n",inet_ntoa(pin.sin_addr));
+    printf("Request: %s\n",dir);
+    
+    char *http = "HTTP/1.1 200 OK\nServer: Padik http\nContent-type: text/html\nConnection: Keep-Alive";
+    
+    send(sd_current, http, strlen(http),0);
+   /* }while(true);*/
     
     // Close sockets 
     
