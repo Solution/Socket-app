@@ -15,7 +15,7 @@
 #include <arpa/inet.h>
 #include <cstdlib>
 
-#define PORT 0x8950
+#define PORT 25000
 #define DIRSIZE 8192
 
 using namespace std;
@@ -82,9 +82,22 @@ int main(int argc, char** argv)
     
     char *http = "HTTP/1.1 200 OK\nServer: Padik http\nContent-type: text/html\nConnection: Keep-Alive";
     
-    send(sd_current, http, strlen(http),0);
-   /* }while(true);*/
-    
+    /*if(send(sd_current, http, strlen(http),0) == -1)
+    {
+        perror("Send error: ");
+        exit(1);
+    }*/
+    while(5)
+    {
+    if(write(sd_current, http, strlen(http)) == -1)
+    {
+        perror("write error: ");
+        exit(1);
+    }
+    }
+    printf("%s",http);
+    //}while(true);
+     
     // Close sockets 
     
     close(sd_current);
