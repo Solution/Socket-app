@@ -80,20 +80,25 @@ int main(int argc, char** argv)
     printf("Connection from: %s\n",inet_ntoa(pin.sin_addr));
     printf("Request: %s\n",dir);
     
-    char *http = "HTTP/1.1 200 OK\nServer: Padik http\nContent-type: text/html\nConnection: Keep-Alive";
+    char *httpBody = "<html><head></head><body><h1>It work's</h1></body></html>";
+    /*int httpLen = strlen(&httpBody);*/
     
+    char *httpHeader = "HTTP/1.1 200 OK\r\nServer: Padik\r\nContent-type: text/html;charset=UTF-8\r\nConnection: Keep-Alive\r\nContent-Length:\r\n";
+    
+   // char *http = strcat(httpHeader, httpBody);
     /*if(send(sd_current, http, strlen(http),0) == -1)
     {
         perror("Send error: ");
         exit(1);
     }*/
 
-    if(write(sd_current, http, strlen(http)) == -1)
+    //char *header = "HTTP/1.1 200 OK";
+    if(write(sd_current, httpHeader, strlen(httpHeader)) == -1)
     {
         perror("write error: ");
         exit(1);
     }
-    printf("%s",http);
+    printf("%s",httpHeader);
     //}while(true);
      
     // Close sockets 
