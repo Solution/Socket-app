@@ -14,15 +14,20 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <cstdlib>
+#include <vector>
+#include <pcrecpp.h>
 
 #define PORT 25000
 #define DIRSIZE 8192
 
-using namespace std;
+//#include "Request.h"
 
+using namespace std;
+using namespace pcrecpp;
 /*
  * 
  */
+
 int main(int argc, char** argv) 
 {
     char dir[DIRSIZE]; // Incoming, outgoing data 
@@ -61,15 +66,16 @@ int main(int argc, char** argv)
         perror("listen error"); // throw new error
         exit(1); // kill
     }
-       
-    //do{ 
+        cout << "Socket stat:  " << sd << "\n" << endl;
     // client accept talk
+    do{
     addrlen = sizeof(pin);
     if((sd_current = accept(sd, (struct sockaddr *) &pin, (socklen_t *) &addrlen)) == -1)
     {
         perror("accept error"); //throw new error
         exit(1);
     }
+     
     
     if(recv(sd_current, dir, sizeof(dir),0) == -1)
     {
@@ -78,28 +84,31 @@ int main(int argc, char** argv)
     }
     
     printf("Connection from: %s\n",inet_ntoa(pin.sin_addr));
-    printf("Request: %s\n",dir);
+    //printf("Request: %s\n",dir);
     
+    string fst;
+    string snd;
+    
+    //  GET /kill HTTP/1.1  
+    pcrecpp::RE regxp("(GET) ([\\w//]+))");
+    regxp.PartialMatch(dir, &fst, &snd);
+    
+    //cout << fst << ":" << snd << endl;
+    cout << dir << endl;
     char *httpBody = "<html><head></head><body><h1>It work's</h1></body></html>";
-    /*int httpLen = strlen(&httpBody);*/
     
-    char *httpHeader = "HTTP/1.1 200 OK\r\nServer: Padik\r\nContent-type: text/html;charset=UTF-8\r\nConnection: Keep-Alive\r\nContent-Length:\r\n";
-    
-   // char *http = strcat(httpHeader, httpBody);
-    /*if(send(sd_current, http, strlen(http),0) == -1)
-    {
-        perror("Send error: ");
-        exit(1);
-    }*/
+    //char *httpHeader = "HTTP/1.1 200 OK\r\nServer: Padik\r\nContent-type: text/html;charset=UTF-8\r\nConnection: Keep-Alive\r\nContent-Length:\r\n";
 
-    //char *header = "HTTP/1.1 200 OK";
-    if(write(sd_current, httpHeader, strlen(httpHeader)) == -1)
+    if(write(sd_current, httpBody, strlen(httpBody)) == -1)
     {
         perror("write error: ");
         exit(1);
     }
-    printf("%s",httpHeader);
-    //}while(true);
+    //printf("%s",httpHeader);
+    
+    close(sd_current);
+   
+    }while(true);
      
     // Close sockets 
     
